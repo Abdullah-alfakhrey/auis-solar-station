@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pyranometer Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" id="logo">
+    <h1>Real-Time Pyranometer Dashboard</h1>
+  </header>
+
+  <main>
+    <div class="readings">
+      <p><strong>Irradiance:</strong> <span id="irradiance">--</span> W/m²</p>
+      <p><strong>Efficiency:</strong> <span id="efficiency">--</span> %</p>
+    </div>
+
+    <canvas id="irradianceChart"></canvas>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
