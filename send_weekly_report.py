@@ -77,22 +77,27 @@ def build_csv_bytes(rows):
 
 
 def send_email(config, csv_bytes, row_count):
-    sender = config['GMAIL_SENDER']
-    recipient = config['RECIPIENT_EMAIL']
-    password = config['GMAIL_APP_PASSWORD']
+    sender = config['GMAIL_SENDER'].strip()
+    password = ''.join(config['GMAIL_APP_PASSWORD'].split())
+
+    recipient_text = config['RECIPIENT_EMAIL']
+    recipients = [email.strip() for email in str(recipient_text).split(',') if email.strip()]
+
+    if not recipients:
+        raise ValueError("No recipient email address configured")
 
     week_end = datetime.now().strftime('%Y-%m-%d')
     week_start = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-    subject = f"AUIS Solar Station — Weekly Report {week_start} to {week_end}"
+    subject = f"AUIS Solar Station - Weekly Report {week_start} to {week_end}"
 
     msg = MIMEMultipart()
     msg['From'] = sender
-    msg['To'] = recipient
+    msg['To'] = ', '.join(recipients)
     msg['Subject'] = subject
 
     body = (
         f"Weekly pyranometer report from the AUIS Solar Station.\n\n"
-        f"Period : {week_start}  →  {week_end}\n"
+        f"Period : {week_start} to {week_end}\n"
         f"Rows   : {row_count} readings\n\n"
         f"The CSV file is attached.\n"
     )
@@ -105,13 +110,13 @@ def send_email(config, csv_bytes, row_count):
     attachment.add_header('Content-Disposition', f'attachment; filename="{filename}"')
     msg.attach(attachment)
 
-    print(f"Connecting to smtp.gmail.com:587 …")
+    print("Connecting to smtp.gmail.com:587 ...")
     with smtplib.SMTP('smtp.gmail.com', 587) as server:
         server.starttls()
         server.login(sender, password)
-        server.sendmail(sender, recipient, msg.as_string())
+        server.sendmail(sender, recipients, msg.as_string())
 
-    print(f"Email sent to {recipient}  ({row_count} rows attached)")
+    print(f"Email sent to {', '.join(recipients)} ({row_count} rows attached)")
 
 
 def main():
